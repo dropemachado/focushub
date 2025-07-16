@@ -22,25 +22,55 @@ router.get('/', (req, res) => {
 // Criar nova tarefa
 router.post('/', (req, res) => {
   const { title } = req.body;
+
+  if (!title || typeof title !== 'string') {
+    return res.status(400).json({ error: 'Título inválido' });
+  }
+
   const newTask = {
     id: Date.now(),
     title,
     done: false
   };
+
   tasks.push(newTask);
   res.status(201).json(newTask);
 });
 
 // Alternar conclusão da tarefa
 router.patch('/:id', (req, res) => {
-  const taskId = parseInt(req.params.id);
-  const task = tasks.find(t => t.id === taskId);
-  if (task) {
-    task.done = !task.done;
-    res.json(task);
-  } else {
-    res.status(404).json({ error: 'Tarefa não encontrada' });
+  const taskId = Number(req.params.id);
+
+  if (isNaN(taskId)) {
+    return res.status(400).json({ error: 'ID inválido' });
   }
+
+  const task = tasks.find(t => t.id === taskId);
+
+  if (!task) {
+    return res.status(404).json({ error: 'Tarefa não encontrada' });
+  }
+
+  task.done = !task.done;
+  res.json(task);
+});
+
+// Deletar tarefa
+router.delete('/:id', (req, res) => {
+  const taskId = Number(req.params.id);
+
+  if (isNaN(taskId)) {
+    return res.status(400).json({ error: 'ID inválido' });
+  }
+
+  const index = tasks.findIndex(t => t.id === taskId);
+
+  if (index === -1) {
+    return res.status(404).json({ error: 'Tarefa não encontrada' });
+  }
+
+  const deletedTask = tasks.splice(index, 1)[0];
+  res.json(deletedTask);
 });
 
 module.exports = router;
