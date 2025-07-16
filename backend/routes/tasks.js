@@ -5,12 +5,12 @@ let tasks = [
   {
     id: 1,
     title: 'Focar por 25 minutos',
-    completed: false
+    done: false
   },
   {
     id: 2,
     title: 'Evitar distrações por 1 hora',
-    completed: false
+    done: false
   }
 ];
 
@@ -25,18 +25,18 @@ router.post('/', (req, res) => {
   const newTask = {
     id: Date.now(),
     title,
-    completed: false
+    done: false
   };
   tasks.push(newTask);
   res.status(201).json(newTask);
 });
 
-// Marcar tarefa como concluída
+// Alternar conclusão da tarefa
 router.patch('/:id', (req, res) => {
   const taskId = parseInt(req.params.id);
   const task = tasks.find(t => t.id === taskId);
   if (task) {
-    task.completed = true;
+    task.done = !task.done;
     res.json(task);
   } else {
     res.status(404).json({ error: 'Tarefa não encontrada' });
